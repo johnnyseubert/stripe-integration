@@ -19,7 +19,7 @@ export const createCheckoutController = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'user not found' });
    }
 
-   const checkout = await createCheckoutSession(userId);
+   const checkout = await createCheckoutSession(userId, user.email);
 
    return res.json(checkout);
 };

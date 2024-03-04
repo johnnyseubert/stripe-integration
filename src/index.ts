@@ -1,13 +1,20 @@
 import express from 'express';
+import { createCheckoutController } from './controllers/checkout.controller';
+import { stripeWebhookController } from './controllers/stripe.controller';
+import { createTodoController } from './controllers/todo.controller';
 import {
    createUserController,
    findOneUserController,
    listUsersController,
 } from './controllers/user.controller';
-import { createTodoController } from './controllers/todo.controller';
-import { createCheckoutController } from './controllers/checkout.controller';
 
 const app = express();
+
+app.post(
+   '/webhook',
+   express.raw({ type: 'application/json' }),
+   stripeWebhookController
+);
 
 app.use(express.json());
 
