@@ -17,10 +17,32 @@ export const createTodoController = async (req: Request, res: Response) => {
       where: {
          id: userId,
       },
+      select: {
+         id: true,
+         stripeSubscriptionId: true,
+         stripeSubscriptionStatus: true,
+         _count: {
+            select: {
+               todos: true,
+            },
+         },
+      },
    });
 
    if (!user) {
       return res.status(400).json({ error: 'user not found' });
+   }
+
+   const hasQuotaAvailable = user._count.todos < 5;
+   const hasActiveSubscription =
+      user.stripeSubscriptionId && user.stripeSubscriptionStatus === 'active';
+
+   if (!hasActiveSubscription && !hasQuotaAvailable) {
+      return res
+         .status(400)
+         .json({
+            error: 'You need a PRO subscription, to create more than five todos',
+         });
    }
 
    const todo = await prisma.todo.create({
